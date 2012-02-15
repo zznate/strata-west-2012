@@ -16,3 +16,6 @@ The following software is required for users of this tutorial:
 * Apache Maven 3.0.4 or greater
 * Apache Cassandra 1.0.7 or greater (Use the DataStax Community distribution located here: http://www.datastax.com/download/community/versions)	
 * An IDE (Eclipse or ItelliJ) is helpful, but not necessary	
+
+This is mostly just a placeholder for now, but new code should be going up regularly. Some of these tutorials will be take from https://github.com/zznate/cassandra-tutorial and https://github.com/zznate/hector-examples so feel free to look at either of those in the meantime. 
+
