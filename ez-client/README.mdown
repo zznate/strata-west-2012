@@ -1,0 +1,57 @@
+Cassandra EZ Client Overview
+----------------------------
+This is a client API for Apache Cassandra. It is designed to be very high-level specifically for people who have never used Apache Cassandra (or other NoSQL systems). 
+
+The API sits on top of Hector (http://github.com/rantav/hector) and makes it really easy to get started, then make the transition as needed once users become more comfortable.
+
+
+Getting Started
+---------------
+We will assume that Apache Cassandra is running on localhost with port 9160 open for the Thrift API (these are the defaults) and that you have created a keyspace and a column family called "Keyspace1" and "Standard1" respectively. 
+
+First make a connection to Apache Cassandra via the Cassandra object:
+
+> Cassandra cassandra = new Cassandra();
+
+Now you need to specify which the Keyspace to which you would like to connect:
+
+> Keyspace keyspace = cassandra.getKeyspace("Keyspace1");
+
+With the keyspace specified, we can then aquire a handle to the ColumnFamily object against which we will issue updates and queries:
+
+> ColumnFamily columnFamily = keyspace.getColumnFamily("Standard1");
+
+The Cassandra and Keyspace objects are designed to be long-lived and should only need to be created once (per keyspace in the case of Keyspace) in your application. ColumnFamily may be long lived as well, but you will most likely have multiple instances for the same column family with slightly different configurations once you get going. 
+
+With this all setup, let's insert some data:
+
+> Row row = new Row();    
+> row.put("column1","value1");   
+> row.put("column2","value2");    
+> columnFamily.insert(row);    
+
+The above code created a row with an automatically generated key and inserted two columns. To read the values, we can issue a query based on the above row:
+
+> CFCursor cursor = columnFamily.query(row);    
+> Row foundRow = cursor.next();
+
+The foundRow object above should identical columns to the original inserted row. 
+
+For data with multiple types, convenience methods provide an easy way to retrieve objects from the row. Given the following insertion code:
+
+> Row row = new Row();    
+> row.put("column1", "value1");    
+> row.put(2, "value2");    
+> row.put(3, false);    
+> columnFamily.insert(row);   
+
+You can retrieve the values like so:
+
+> String value1 = foundRow.getString("column1");    
+> String value2 = foundRow.getString(2);    
+> boolean value3 = foundRow.getBoolean(3);    
+
+
+
+
+
