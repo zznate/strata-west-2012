@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.validation.Valid;
 
+import me.prettyprint.hector.api.Keyspace;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping(value="/account")
 public class AccountController {
 
+  @Autowired
+  private Keyspace keyspace;
   // TODO inject AccountAccess object
 	private Map<Long, Account> accounts = new ConcurrentHashMap<Long, Account>();
 	
