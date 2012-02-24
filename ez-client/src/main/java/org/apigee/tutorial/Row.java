@@ -25,10 +25,25 @@ public class Row {
     new HashMap<ByteBuffer,HColumn<DynamicComposite, ByteBuffer>>();
   private static MicrosecondsSyncClockResolution clockResolution = new MicrosecondsSyncClockResolution();
   private static final DynamicCompositeSerializer dcs = new DynamicCompositeSerializer();
-  
+  private ColumnFamily columnFamily;
+
+  public Row() {
+  }
+
+  Row apply(ColumnFamily columnFamily) {
+    this.columnFamily = columnFamily;
+    return this;
+  }
+
   public Row setKey(String key) {
     this.key = key;
     return this;
+  }
+
+  public void increment(Object columnName, long value) {
+    // if columnFamily.hasExtension(CfExtension.ExtType.COUNTER) is false,
+    // * create the counter columnFamily
+
   }
    
   public Row put(Object columnName, Object columnValue) {

@@ -7,23 +7,25 @@ import me.prettyprint.hector.api.beans.DynamicComposite;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
-public class CFCursor implements Iterator<Row> {
+public class CFCursor implements Iterable<Row>,Iterator<Row> {
 
   private final ColumnFamilyResult<ByteBuffer,DynamicComposite> columnFamilyResult;
-  
-  CFCursor(ColumnFamilyResult<ByteBuffer, DynamicComposite> columnFamilyResult) {
-    this.columnFamilyResult = columnFamilyResult;    
+  private final ColumnFamily columnFamily;
+
+  CFCursor(ColumnFamily columnFamily, ColumnFamilyResult<ByteBuffer, DynamicComposite> columnFamilyResult) {
+    this.columnFamilyResult = columnFamilyResult;
+    this.columnFamily = columnFamily;
   }
   
   @Override
   public boolean hasNext() {
-    return columnFamilyResult.hasNext();
+    return columnFamilyResult != null && columnFamilyResult.hasNext();
   }
 
   @Override
   public Row next() {   
     // CFR is already at 1st position, JDBC style
-    Row row = new Row();    
+    Row row = new Row().apply(columnFamily);
     row.setKey(StringSerializer.get().fromByteBuffer(columnFamilyResult.getKey()));
     for (DynamicComposite columnName : columnFamilyResult.getColumnNames() ) {
       row.put(columnName, columnFamilyResult.getColumn(columnName));
@@ -37,5 +39,9 @@ public class CFCursor implements Iterator<Row> {
   public void remove() {
     columnFamilyResult.remove();    
   }
-  
+
+  @Override
+  public Iterator<Row> iterator() {
+    return this;
+  }
 }
