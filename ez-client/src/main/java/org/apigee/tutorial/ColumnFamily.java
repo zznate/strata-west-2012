@@ -25,19 +25,17 @@ public class ColumnFamily {
 
   private final ExecutingKeyspace keyspace;
   private final String columnFamilyName;
-  private final ColumnFamilyTemplate<ByteBuffer,DynamicComposite> columnFamilyTemplate;
+  private final ColumnFamilyTemplate<ByteBuffer,ByteBuffer> columnFamilyTemplate;
   private final ConcurrentHashMap extensions = new ConcurrentHashMap();
-  
-  private static final DynamicCompositeSerializer dcs = new DynamicCompositeSerializer();
   
   ColumnFamily(String columnFamilyName, ExecutingKeyspace keyspace) {
     this.columnFamilyName = columnFamilyName;
     this.keyspace = keyspace;    
     this.columnFamilyTemplate = 
-      new ThriftColumnFamilyTemplate<ByteBuffer,DynamicComposite>(keyspace, 
+      new ThriftColumnFamilyTemplate<ByteBuffer,ByteBuffer>(keyspace,
           columnFamilyName, 
           ByteBufferSerializer.get(), 
-          dcs);
+          ByteBufferSerializer.get());
   }
 
   public void index(Object columnName, String indexName) {
@@ -47,8 +45,8 @@ public class ColumnFamily {
   
   public void insert(Row row) {
     Mutator<ByteBuffer> mutator = columnFamilyTemplate.createMutator();
-    for (Map.Entry<ByteBuffer,HColumn<DynamicComposite,ByteBuffer>> entry : row.getColumns().entrySet() ) {
-      HColumn<DynamicComposite, ByteBuffer> hColumn = entry.getValue();
+    for (Map.Entry<ByteBuffer,HColumn<ByteBuffer,ByteBuffer>> entry : row.getColumns().entrySet() ) {
+      HColumn<ByteBuffer, ByteBuffer> hColumn = entry.getValue();
       mutator.addInsertion(row.getKeyBytes(), columnFamilyName, hColumn);
       // insert new row in index cf with key: cfname_colname and colname: Composite(value, rowkey, timestamp)
       // key: rowkey_colname and colname: timestamp colvalue: value
@@ -86,30 +84,19 @@ public class ColumnFamily {
 
     @Override
     public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Client cassandra) throws HectorException {
-
       try {
         CqlResult result = cassandra.execute_cql_query(StringSerializer.get().toByteBuffer(cql), Compression.GZIP);
         switch (result.getType()) {
           case VOID:
-
             return null;
-
           default:
             if ( result.getRowsSize() > 0 ) {
               LinkedHashMap<ByteBuffer, List<ColumnOrSuperColumn>> ret = new LinkedHashMap<ByteBuffer, List<ColumnOrSuperColumn>>(result.getRowsSize());
-
               for (Iterator<CqlRow> rowsIter = result.getRowsIterator(); rowsIter.hasNext(); ) {
                 CqlRow row = rowsIter.next();
                 ret.put(ByteBuffer.wrap(row.getKey()), filterKeyColumn(row));
               }
               return ret;
-              /*
-              ColumnFamilyResultWrapper(Serializer<K> keySerializer,
-                    Serializer<N> columnNameSerializer,
-                    ExecutionResult<Map<ByteBuffer,List<ColumnOrSuperColumn>>> executionResult)
-
-               */
-              //rows = new CqlRows<K, N, V>((LinkedHashMap<K, List<Column>>)thriftRet, columnNameSerializer, valueSerializer);
             }
             break;
         }

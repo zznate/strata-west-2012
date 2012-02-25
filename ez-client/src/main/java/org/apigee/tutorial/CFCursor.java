@@ -9,10 +9,10 @@ import java.util.Iterator;
 
 public class CFCursor implements Iterable<Row>,Iterator<Row> {
 
-  private final ColumnFamilyResult<ByteBuffer,DynamicComposite> columnFamilyResult;
+  private final ColumnFamilyResult<ByteBuffer,ByteBuffer> columnFamilyResult;
   private final ColumnFamily columnFamily;
 
-  CFCursor(ColumnFamily columnFamily, ColumnFamilyResult<ByteBuffer, DynamicComposite> columnFamilyResult) {
+  CFCursor(ColumnFamily columnFamily, ColumnFamilyResult<ByteBuffer, ByteBuffer> columnFamilyResult) {
     this.columnFamilyResult = columnFamilyResult;
     this.columnFamily = columnFamily;
   }
@@ -27,7 +27,7 @@ public class CFCursor implements Iterable<Row>,Iterator<Row> {
     // CFR is already at 1st position, JDBC style
     Row row = new Row().apply(columnFamily);
     row.setKey(StringSerializer.get().fromByteBuffer(columnFamilyResult.getKey()));
-    for (DynamicComposite columnName : columnFamilyResult.getColumnNames() ) {
+    for (ByteBuffer columnName : columnFamilyResult.getColumnNames() ) {
       row.put(columnName, columnFamilyResult.getColumn(columnName));
     }
     if ( columnFamilyResult.hasNext() )

@@ -1,8 +1,12 @@
 package org.apigee.tutorial;
 
 import me.prettyprint.cassandra.service.CassandraHostConfigurator;
+import me.prettyprint.cassandra.service.ThriftCfDef;
 import me.prettyprint.cassandra.service.ThriftCluster;
 import me.prettyprint.cassandra.service.ThriftKsDef;
+import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition;
+import me.prettyprint.hector.api.ddl.ColumnType;
+import me.prettyprint.hector.api.ddl.ComparatorType;
 import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +24,8 @@ public class Cassandra {
 
   private final CassandraHostConfigurator cassandraHostConfigurator;
   private final ThriftCluster thriftCluster;
+
+  final String COUNTER_CF_NAME = "EzClientCountersCf";
   
   public Cassandra() {
     this("localhost:9161",false);
@@ -36,15 +42,27 @@ public class Cassandra {
       cassandraHostConfigurator.setRunAutoDiscoveryAtStartup(true);
     thriftCluster = new ThriftCluster("CassandraCluster", cassandraHostConfigurator);
   }
-  
-  
+
+  /**
+   * Get a Keyspace, creating it if necessary
+   * @param keyspaceName
+   * @return
+   */
   public Keyspace getKeyspace(String keyspaceName) {
     Keyspace keyspace = new Keyspace(keyspaceName, thriftCluster);
     if (! getKeyspaces().contains(keyspace) ) {
-      log.info("attempting keyspace create");
-      thriftCluster.addKeyspace(new ThriftKsDef(keyspaceName, "SimpleStrategy", 1, null), true);
+      buildEzClientKeyspace(keyspaceName);
     }
     return keyspace;
+  }
+
+  private void buildEzClientKeyspace(String keyspaceName) {
+    log.info("attempting keyspace create");
+    ThriftCfDef cfDef = new ThriftCfDef(keyspaceName, COUNTER_CF_NAME);
+    cfDef.setDefaultValidationClass(ComparatorType.COUNTERTYPE.toString());
+    List<ColumnFamilyDefinition> cfDefs = new ArrayList<ColumnFamilyDefinition>();
+    cfDefs.add(cfDef);
+    thriftCluster.addKeyspace(new ThriftKsDef(keyspaceName, "SimpleStrategy", 1, cfDefs), true);
   }
   
   public List<Keyspace> getKeyspaces() {

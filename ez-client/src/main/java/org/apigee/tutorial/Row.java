@@ -14,17 +14,18 @@ import java.util.*;
 /**
  * Models an row in an Apache Cassandra column family. Allows for 
  * generic storage and retrieval of basic types while maintaining 
- * type safety.
+ * type safety. Supports counters by deffering to an automatically
+ * created column family, storing the counter columns under the same key
  *  
  * @author zznate
  */
 public class Row {
   
   private String key;
-  private Map<ByteBuffer,HColumn<DynamicComposite, ByteBuffer>> columnMap = 
-    new HashMap<ByteBuffer,HColumn<DynamicComposite, ByteBuffer>>();
+  private Map<ByteBuffer,HColumn<ByteBuffer, ByteBuffer>> columnMap =
+    new HashMap<ByteBuffer,HColumn<ByteBuffer, ByteBuffer>>();
   private static MicrosecondsSyncClockResolution clockResolution = new MicrosecondsSyncClockResolution();
-  private static final DynamicCompositeSerializer dcs = new DynamicCompositeSerializer();
+  private static final TypeInferringSerializer tis = TypeInferringSerializer.get();
   private ColumnFamily columnFamily;
 
   public Row() {
@@ -41,28 +42,23 @@ public class Row {
   }
 
   public void increment(Object columnName, long value) {
-    // if columnFamily.hasExtension(CfExtension.ExtType.COUNTER) is false,
-    // * create the counter columnFamily
+    // add this to the 'application countrs' CF under this key
 
   }
    
   public Row put(Object columnName, Object columnValue) {
-    DynamicComposite dColName = new DynamicComposite();
-    dColName.add(0,columnName);
-    if ( columnValue != null ) {
-      DynamicComposite dColValue = new DynamicComposite();
-      dColValue.add(0, columnValue);
-      columnMap.put(dColName.getComponent(0).getBytes(), 
-          new HColumnImpl<DynamicComposite, ByteBuffer>(dColName, 
-              dColValue.getComponent(0).getBytes(), 
-              clockResolution.createClock(), dcs, ByteBufferSerializer.get()));
-    } else {
-      columnMap.put(dColName.getComponent(0).getBytes(), 
-          new HColumnImpl<DynamicComposite, ByteBuffer>(dColName, 
-              ByteBuffer.wrap(new byte[0]), 
-              clockResolution.createClock(), dcs, ByteBufferSerializer.get()));
-    }
+    ByteBuffer colName = tis.toByteBuffer(columnName);
+    columnMap.put(colName,
+            new HColumnImpl<ByteBuffer, ByteBuffer>(colName,
+                    columnValue == null ? ByteBuffer.wrap(new byte[0]) : tis.toByteBuffer(columnValue),
+                    clockResolution.createClock(),
+                    ByteBufferSerializer.get(), ByteBufferSerializer.get()));
     return this;
+  }
+
+  public long getCount(Object columnName) {
+    // execute a CQL counter query independent of the colmap
+    return 0;
   }
     
   public boolean hasColumns() {
@@ -102,9 +98,7 @@ public class Row {
    * value serializers
    */
   public <T> T get(Serializer<T> serializer, Object columnName) {
-    DynamicComposite dc = new DynamicComposite();
-    dc.add(0, columnName);
-    HColumn<DynamicComposite, ByteBuffer> column = columnMap.get(dc.getComponent(0).getBytes());
+    HColumn<ByteBuffer, ByteBuffer> column = columnMap.get(tis.toByteBuffer(columnName));
     if ( column == null ) {
       return null;
     }
@@ -114,12 +108,12 @@ public class Row {
   ByteBuffer getKeyBytes() {
     return StringSerializer.get().toByteBuffer(getKey());
   }
-  Map<ByteBuffer,HColumn<DynamicComposite, ByteBuffer>> getColumns() {
+  Map<ByteBuffer,HColumn<ByteBuffer, ByteBuffer>> getColumns() {
     return columnMap;
   }
     
-  List<DynamicComposite> getColumnsForQuery() {
-    List<DynamicComposite> cols = new ArrayList<DynamicComposite>(columnMap.size());
+  List<ByteBuffer> getColumnsForQuery() {
+    List<ByteBuffer> cols = new ArrayList<ByteBuffer>(columnMap.size());
     for (ByteBuffer buf : columnMap.keySet()) {
       cols.add(columnMap.get(buf).getName());
     }
@@ -132,7 +126,7 @@ public class Row {
     return key;
   }
   
-  void put(DynamicComposite columnName, HColumn<DynamicComposite,ByteBuffer> column) {
-    columnMap.put(columnName.getComponent(0).getBytes(), column);
+  void put(ByteBuffer columnName, HColumn<ByteBuffer,ByteBuffer> column) {
+    columnMap.put(columnName, column);
   }
 }
