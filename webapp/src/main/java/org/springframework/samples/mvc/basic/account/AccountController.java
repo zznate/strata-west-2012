@@ -50,4 +50,11 @@ public class AccountController {
 		return "account/view";
 	}
 
+  @RequestMapping(value="list", method=RequestMethod.GET)
+  	public String getList(Model model) {
+      // TODO update to AccountAccess.get(id);
+  		model.addAttribute("accounts",this.accounts.values());
+  		return "account/list";
+  	}
+
 }

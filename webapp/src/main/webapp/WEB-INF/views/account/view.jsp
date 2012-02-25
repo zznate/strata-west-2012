@@ -20,29 +20,16 @@
 	<h1>
 		View Account
 	</h1>
-	<div class="span-12 last">	
-		<form:form modelAttribute="account" action="${account.id}" method="post">
-		  	<fieldset>		
-				<legend>Account Fields</legend>
-				<p>
-					<form:label	for="name" path="name">Name</form:label><br/>
-					<form:input path="name" readonly="true"/>		
-				</p>
-				<p>	
-					<form:label for="balance" path="balance">Balance</form:label><br/>
-					<form:input path="balance" readonly="true"/>
-				</p>
-				<p>
-					<form:label for="equityAllocation" path="equityAllocation">Equity Allocation</form:label><br/>
-					<form:input path="equityAllocation" readonly="true"/>
-				</p>
-				<p>	
-					<form:label for="renewalDate" path="renewalDate">Renewal Date</form:label><br/>
-					<form:input path="renewalDate" readonly="true"/>
-				</p>
-			</fieldset>
-		</form:form>
+
+	<div class="span-24 last">
+		<p>Account Name: ${account.name}</p>
 	</div>
+
+
+	<div class="span-24 last">
+		<p>Balance: ${account.balance}</p>
+	</div>
+
 	<hr>	
 	<ul>
 		<li> <a href="?locale=en_us">us</a> |  <a href="?locale=en_gb">gb</a> | <a href="?locale=es_es">es</a> | <a href="?locale=de_de">de</a> </li>
