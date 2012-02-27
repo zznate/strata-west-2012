@@ -65,20 +65,23 @@ import java.util.Iterator;
  * @author zznate
  */
 public class TimeseriesIterationQuery extends TutorialBase {
-  private Logger log = LoggerFactory.getLogger(TimeseriesIterationQuery.class);
+  private static Logger log = LoggerFactory.getLogger(TimeseriesIterationQuery.class);
 
   // ColumnSliceIterator with paging
   public static void main(String [] args) {
     init();
     verifySchema();
-    String key = args[0];
-    if (StringUtils.isBlank(key)) {
+    String key;
+    if (args == null || args.length == 0 || StringUtils.isBlank(args[0])) {
+      //bd1f1500-f92b-1a51-813e-68a86d54ced2
       throw new IllegalArgumentException("Could not read key from arguments. Please use: " +
               "mvn -e exec:java -Dexec.args='[key]' -Dexec.mainClass=\"org.apigee.tutorial.TimeseriesIterationQuery\"");
     }
+    key = args[0];
+    long timer = System.currentTimeMillis();
     TimeseriesIterationQuery tiq = new TimeseriesIterationQuery();
     tiq.printColumns(key);
-
+    log.info("Iteration took {} seconds", (System.currentTimeMillis() - timer) / 1000);
   }
 
   public void printColumns(String key) {
