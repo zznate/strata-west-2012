@@ -13,6 +13,7 @@ public class CFCursor implements Iterable<Row>,Iterator<Row> {
   private final ColumnFamily columnFamily;
 
   CFCursor(ColumnFamily columnFamily, ColumnFamilyResult<ByteBuffer, ByteBuffer> columnFamilyResult) {
+    // change this to SliceQuery?
     this.columnFamilyResult = columnFamilyResult;
     this.columnFamily = columnFamily;
   }

@@ -29,6 +29,7 @@ public class ColumnFamily {
   private final ConcurrentHashMap extensions = new ConcurrentHashMap();
   
   ColumnFamily(String columnFamilyName, ExecutingKeyspace keyspace) {
+    // TODO add CfMetaData poll in c-tor
     this.columnFamilyName = columnFamilyName;
     this.keyspace = keyspace;    
     this.columnFamilyTemplate = 
@@ -44,6 +45,7 @@ public class ColumnFamily {
   }
   
   public void insert(Row row) {
+    // TODO if row.hasCounters(); add to counter CF
     Mutator<ByteBuffer> mutator = columnFamilyTemplate.createMutator();
     for (Map.Entry<ByteBuffer,HColumn<ByteBuffer,ByteBuffer>> entry : row.getColumns().entrySet() ) {
       HColumn<ByteBuffer, ByteBuffer> hColumn = entry.getValue();
@@ -56,7 +58,7 @@ public class ColumnFamily {
   }
   
   public CFCursor query(Row row) {
-      // how are ranges handled in MBD? #query(Row, Row)
+      // TODO add test case
     CFCursor cursor;
     if ( !row.hasColumns() ) {
       cursor = new CFCursor(this,columnFamilyTemplate.queryColumns(row.getKeyBytes()));

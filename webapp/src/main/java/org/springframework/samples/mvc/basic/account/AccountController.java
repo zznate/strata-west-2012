@@ -52,7 +52,7 @@ public class AccountController {
 
   @RequestMapping(value="list", method=RequestMethod.GET)
   	public String getList(Model model) {
-      // TODO update to AccountAccess.get(id);
+      // TODO update to AccountAccess.iterator();
   		model.addAttribute("accounts",this.accounts.values());
   		return "account/list";
   	}

@@ -30,7 +30,7 @@
       <name>Nate McCall</name>
       <roles>
         <role>packager</role>
-	<role>developer</role>
+	    <role>developer</role>
       </roles>
     </developer>
   </developers>
@@ -49,8 +49,6 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <sourceReleaseAssemblyDescriptor>source-release</sourceReleaseAssemblyDescriptor>
-    <cassandra.host>localhost</cassandra.host>
   </properties>
 
   <dependencies>

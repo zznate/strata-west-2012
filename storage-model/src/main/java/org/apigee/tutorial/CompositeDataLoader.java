@@ -1,6 +1,5 @@
 package org.apigee.tutorial;
 
-import com.datastax.tutorial.TutorialBase;
 import me.prettyprint.cassandra.serializers.CompositeSerializer;
 import me.prettyprint.cassandra.serializers.StringSerializer;
 import me.prettyprint.hector.api.beans.Composite;
@@ -9,6 +8,7 @@ import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.mutation.Mutator;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apigee.tutorial.common.TutorialBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,8 @@ import java.util.concurrent.Future;
  * Execute this class by invoking the following at the project root:
  * mvn -e exec:java -Dexec.mainClass="com.apigee.tutorial.composite.CompositeDataLoader"
  * @author zznate
+ *
+ * TODO copy over data file from tutorial into 'data/' directory
  */
 public class CompositeDataLoader extends TutorialBase {
   private static Logger log = LoggerFactory.getLogger(CompositeDataLoader.class);
@@ -75,6 +77,12 @@ public class CompositeDataLoader extends TutorialBase {
       exec.shutdown();
     }
     tutorialCluster.getConnectionManager().shutdown();
+  }
+
+  @Override
+  protected void maybeCreateSchema() {
+    // TODO create composite schema 'CompositeSingleRowIndex'
+
   }
 
   private static void doParse(List<String> lines, List<Future<Integer>> sums) {

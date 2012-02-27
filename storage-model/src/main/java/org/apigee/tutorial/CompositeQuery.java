@@ -16,7 +16,9 @@ import java.util.Iterator;
  * a bit more by using Hector's ColumnSliceIterator (CSI) to retrieve results. CSI
  * handles the paging in groups of 100 columns, presenting itself as an Iterator and
  * automatically re-issueing the query with the last result from the iteration as the
- * first result for the next call (automatically hiding it from display).
+ * first result for the next call (automatically hiding it from display). This is a
+ * standard use case for a columnar-oriented distributed database because 'you don't
+ * know what you have until you have it'.
  *
  * This class assumes you have created the CountryStateCity column family in the
  * Tutorial keyspace and have already run {@link org.apigee.tutorial.CompositeDataLoader}
@@ -35,7 +37,7 @@ public class CompositeQuery extends TutorialBase {
   
   public static void main(String []args) {
     init();
-
+    // TODO add maybeCreate() abstract class to tutorial schema
     CompositeQuery compositeQuery = new CompositeQuery();
 
     // Note the use of 'equal' and 'greater-than-equal' for the start and end.
@@ -45,6 +47,11 @@ public class CompositeQuery extends TutorialBase {
 
     compositeQuery.printColumnsFor(start,end);
 
+  }
+
+  @Override
+  protected void maybeCreateSchema() {
+    // checkForCf(); throw IllegalArgumentException if CompositeDataLoader has not been run
   }
 
   /**

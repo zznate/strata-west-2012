@@ -3,6 +3,8 @@ package org.apigee.tutorial.common;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 /**
@@ -10,7 +12,7 @@ import java.util.TimeZone;
  *
  * @author zznate
  */
-enum TimeBucketKeyFormat {
+public enum TimeBucketKeyFormat {
   ALL("__ALL__"),
   MONTH("yyyy_MM"),
   WEEK("yyyy_MM_w"),
@@ -22,10 +24,12 @@ enum TimeBucketKeyFormat {
   public static final String ALL_KEY = "__ALL__";
 
   FastDateFormat formatter;
+  SimpleDateFormat sdf;
 
   TimeBucketKeyFormat(String format) {
     if ( !StringUtils.equals(format, ALL_KEY)) {
       this.formatter = FastDateFormat.getInstance(format, TimeZone.getTimeZone("GMT"));
+      this.sdf = new SimpleDateFormat(format);
     }
   }
 
@@ -40,6 +44,22 @@ enum TimeBucketKeyFormat {
       return toString();
     }
     return formatter.format(date);
+  }
+
+  /**
+   * Return the long value representing this bucket key
+   * @param bucketKey
+   * @return
+   */
+  public long parse(String bucketKey) {
+    if ( bucketKey.equals(ALL_KEY) ) {
+      throw new IllegalArgumentException("Can't parse key for " + ALL_KEY);
+    }
+    try {
+      return sdf.parse(bucketKey).getTime();
+    } catch (ParseException pe) {
+      throw new IllegalArgumentException("could not parse bucket key: " + bucketKey);
+    }
   }
 
   @Override

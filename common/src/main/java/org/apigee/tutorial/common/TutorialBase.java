@@ -10,26 +10,30 @@ import java.io.IOException;
 import java.util.Properties;
 
 public abstract class TutorialBase {
-    protected static Cluster tutorialCluster;
-    protected static Keyspace tutorialKeyspace;
-    protected static Properties properties;
-    
-    protected static void init() {
-        properties = new Properties();
-        try {
-            properties.load(TutorialBase.class.getResourceAsStream("/tutorial.properties"));
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        // To modify the default ConsistencyLevel of QUORUM, create a 
-        // me.prettyprint.hector.api.ConsistencyLevelPolicy and use the overloaded form:
-        // tutorialKeyspace = HFactory.createKeyspace("Tutorial", tutorialCluster, consistencyLevelPolicy);
-        // see also me.prettyprint.tutorial.model.ConfigurableConsistencyLevelPolicy[Test] for details
-        
-        tutorialCluster = HFactory.getOrCreateCluster(properties.getProperty("cluster.name", "TutorialCluster"), 
-                properties.getProperty("cluster.hosts", "127.0.0.1:9160"));
-        ConfigurableConsistencyLevel ccl = new ConfigurableConsistencyLevel();
-        ccl.setDefaultReadConsistencyLevel(HConsistencyLevel.ONE);
-        tutorialKeyspace = HFactory.createKeyspace(properties.getProperty("tutorial.keyspace", "Tutorial"), tutorialCluster, ccl);
+  protected static Cluster tutorialCluster;
+  protected static Keyspace tutorialKeyspace;
+  protected static Properties properties;
+  protected static SchemaUtils schemaUtils;
+
+  protected static void init() {
+    properties = new Properties();
+    try {
+      properties.load(TutorialBase.class.getResourceAsStream("/tutorial.properties"));
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
     }
+    // To modify the default ConsistencyLevel of QUORUM, create a
+    // me.prettyprint.hector.api.ConsistencyLevelPolicy and use the overloaded form:
+    // tutorialKeyspace = HFactory.createKeyspace("Tutorial", tutorialCluster, consistencyLevelPolicy);
+    // see also me.prettyprint.tutorial.model.ConfigurableConsistencyLevelPolicy[Test] for details
+
+    tutorialCluster = HFactory.getOrCreateCluster(properties.getProperty("cluster.name", "TutorialCluster"),
+            properties.getProperty("cluster.hosts", "127.0.0.1:9160"));
+    ConfigurableConsistencyLevel ccl = new ConfigurableConsistencyLevel();
+    ccl.setDefaultReadConsistencyLevel(HConsistencyLevel.ONE);
+    tutorialKeyspace = HFactory.createKeyspace(properties.getProperty("tutorial.keyspace", "Tutorial"), tutorialCluster, ccl);
+    schemaUtils = new SchemaUtils(tutorialCluster);
+  }
+
+  protected abstract void maybeCreateSchema();
 }
