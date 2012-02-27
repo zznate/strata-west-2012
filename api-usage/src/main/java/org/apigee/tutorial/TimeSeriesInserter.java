@@ -40,7 +40,7 @@ import java.util.concurrent.Future;
  * #TIP
  * Use this simple multi-threaded approach for inserts in any batch-loading scenarios.
  *
- * mvn -e exec:java -Dexec.mainClass="com.apigee.training.tutorial.ts.TimeseriesInserter"
+ * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.TimeseriesInserter"
  * @author zznate
  */
 public class TimeseriesInserter extends TutorialBase {
@@ -51,6 +51,7 @@ public class TimeseriesInserter extends TutorialBase {
   public static final String CF_TIMESERIES_SINGLE_ROW = "TimeseriesSingleRow";
 
   public static void main(String[] args) {
+    maybeCreateSchema();
     long startTime = System.currentTimeMillis();
     init();
     exec = Executors.newFixedThreadPool(5);
@@ -85,14 +86,13 @@ public class TimeseriesInserter extends TutorialBase {
     tutorialCluster.getConnectionManager().shutdown();
   }
 
-  @Override
-  protected void maybeCreateSchema() {
+  protected static void maybeCreateSchema() {
     BasicColumnFamilyDefinition columnFamilyDefinition = new BasicColumnFamilyDefinition();
     columnFamilyDefinition.setKeyspaceName(SchemaUtils.TUTORIAL_KEYSPACE_NAME);
     columnFamilyDefinition.setName(CF_TIMESERIES_SINGLE_ROW);
     columnFamilyDefinition.setComparatorType(ComparatorType.LONGTYPE);
     columnFamilyDefinition.setDefaultValidationClass(ComparatorType.LONGTYPE.getClassName());
-    columnFamilyDefinition.setKeyValidationClass(ComparatorType.TIMEUUIDTYPE.getClassName());
+    columnFamilyDefinition.setKeyValidationClass(ComparatorType.UTF8TYPE.getClassName());
     ColumnFamilyDefinition cfDef = new ThriftCfDef(columnFamilyDefinition);
     schemaUtils.maybeCreate(cfDef);
   }

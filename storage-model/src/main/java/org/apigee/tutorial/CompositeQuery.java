@@ -49,9 +49,9 @@ public class CompositeQuery extends TutorialBase {
 
   }
 
-  @Override
+
   protected void maybeCreateSchema() {
-    // checkForCf(); throw IllegalArgumentException if CompositeDataLoader has not been run
+    // TODO checkForCf(); throw IllegalArgumentException if CompositeDataLoader has not been run
   }
 
   /**

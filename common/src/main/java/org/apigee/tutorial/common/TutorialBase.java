@@ -35,5 +35,4 @@ public abstract class TutorialBase {
     schemaUtils = new SchemaUtils(tutorialCluster);
   }
 
-  protected abstract void maybeCreateSchema();
 }

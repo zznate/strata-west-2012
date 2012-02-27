@@ -29,12 +29,13 @@ public class BucketingTimeSeriesInserter extends TutorialBase {
   public static final String CF_BUCKETED_TIMSERIES = "BucketedTimeSeries";
 
   public static void main(String[] args) {
+    maybeCreateSchema();
     // create executor
     // TODO executor(int tpSize) on TutorialBase
   }
 
-  @Override
-  protected void maybeCreateSchema() {
+
+  protected static void maybeCreateSchema() {
     BasicColumnFamilyDefinition columnFamilyDefinition = new BasicColumnFamilyDefinition();
     columnFamilyDefinition.setKeyspaceName(SchemaUtils.TUTORIAL_KEYSPACE_NAME);
     columnFamilyDefinition.setName(CF_BUCKETED_TIMSERIES);
@@ -46,9 +47,19 @@ public class BucketingTimeSeriesInserter extends TutorialBase {
   }
 
   class BucketingRowInserter implements Callable {
+
+    private List<String> keys;
+
+    BucketingRowInserter(List<String> keys) {
+      this.keys = keys;
+    }
+
     @Override
     public Object call() throws Exception {
-      return null;  //To change body of implemented methods use File | Settings | File Templates.
+      // TODO for key : keys,
+      // - build timerangefromkey
+      // for every 1000 cols, insert
+      return null;
     }
 
   }

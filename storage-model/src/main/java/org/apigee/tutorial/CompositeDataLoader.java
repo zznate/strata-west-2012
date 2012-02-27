@@ -79,7 +79,7 @@ public class CompositeDataLoader extends TutorialBase {
     tutorialCluster.getConnectionManager().shutdown();
   }
 
-  @Override
+
   protected void maybeCreateSchema() {
     // TODO create composite schema 'CompositeSingleRowIndex'
 

@@ -34,8 +34,8 @@ public class TombstoneDemoQuery extends TutorialBase {
   }
 
 
-  @Override
-  protected void maybeCreateSchema() {
+
+  protected static void verifySchema() {
     if (!schemaUtils.cfExists(TombstoneDemoInserter.CF_TOMBSTONE_DEMO)) {
       throw new TutorialUsageException("You must first run TombstoneDemoInserter before using this tutorial");
     }

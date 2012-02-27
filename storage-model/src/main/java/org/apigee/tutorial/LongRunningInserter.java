@@ -31,7 +31,6 @@ public class LongRunningInserter extends TutorialBase {
 
   }
 
-  @Override
   protected void maybeCreateSchema() {
     // TODO
   }

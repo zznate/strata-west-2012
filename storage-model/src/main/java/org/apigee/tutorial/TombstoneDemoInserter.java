@@ -27,7 +27,6 @@ public class TombstoneDemoInserter extends TutorialBase {
 
   public static final String CF_TOMBSTONE_DEMO = "TombstoneDemo";
 
-  @Override
   protected void maybeCreateSchema() {
     // TombstoneDemo
         // TODO timeseries CF creation 'TimeseriesSingleRow'
