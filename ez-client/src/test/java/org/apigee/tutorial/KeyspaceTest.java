@@ -14,10 +14,10 @@ public class KeyspaceTest extends BaseCassandraTest {
   public void listColumnFamiliesEmptyOnNew() {
     Keyspace keyspace = cassandra.getKeyspace("EzClientKeyspace");
     List<ColumnFamily> columnFamilies = keyspace.getColumnFamilies();
-    assertEquals(0,columnFamilies.size());
+    assertEquals(1,columnFamilies.size());
     ColumnFamily columFamily = keyspace.getColumnFamily("ezk");
     columnFamilies = keyspace.getColumnFamilies();
-    assertEquals(1,columnFamilies.size());
+    assertEquals(2,columnFamilies.size());
   }
 
 

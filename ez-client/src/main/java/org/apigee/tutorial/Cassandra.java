@@ -96,7 +96,7 @@ public class Cassandra {
   private void buildEzClientKeyspace(String keyspaceName) {
     log.info("attempting keyspace create");
     ThriftCfDef cfDef = new ThriftCfDef(keyspaceName, COUNTER_CF_NAME);
-    cfDef.setDefaultValidationClass(ComparatorType.COUNTERTYPE.toString());
+    cfDef.setDefaultValidationClass(ComparatorType.COUNTERTYPE.getClassName());
     List<ColumnFamilyDefinition> cfDefs = new ArrayList<ColumnFamilyDefinition>();
     cfDefs.add(cfDef);
     thriftCluster.addKeyspace(new ThriftKsDef(keyspaceName, "SimpleStrategy", 1, cfDefs), true);
