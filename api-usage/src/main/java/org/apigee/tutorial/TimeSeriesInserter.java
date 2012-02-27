@@ -51,6 +51,7 @@ public class TimeseriesInserter extends TutorialBase {
   public static final String CF_TIMESERIES_SINGLE_ROW = "TimeseriesSingleRow";
 
   public static void main(String[] args) {
+    init();
     maybeCreateSchema();
     long startTime = System.currentTimeMillis();
     init();
@@ -115,7 +116,7 @@ public class TimeseriesInserter extends TutorialBase {
       int count = 0;
 
       for (int x=0; x<5000; x++) {
-        mutator.addInsertion(myKey,"Series1", buildColumnFor(x));
+        mutator.addInsertion(myKey,CF_TIMESERIES_SINGLE_ROW, buildColumnFor(x));
       }
       mutator.execute();
       log.debug("Inserted {} rows", count);
