@@ -51,19 +51,5 @@ public class BasicUsageExample extends TutorialBase {
     log.info(" 'counter1': {}", foundRow.getCount("counter1"));
     log.info(" '1234L': {}", foundRow.getCount(1234L));
     
-    
-    /*
-        CFCursor cursor = columnFamily.query(row);
-    Row foundRow = cursor.next();
-    assertEquals(row.getKey(), foundRow.getKey());
-    assertEquals("value1",foundRow.getString("column1"));
-    assertEquals("value2",foundRow.getString(2));
-    assertEquals(false, foundRow.getBoolean(3));
-    assertEquals(id,foundRow.getUUID(42));
-    assertEquals("uuid col name", foundRow.getString(id));
-    assertNull(foundRow.getString("didnt store this"));
-    assertEquals(5,foundRow.getCount("counter1"));
-    assertEquals(1,foundRow.getCount(1234L));
-     */
   }
 }
