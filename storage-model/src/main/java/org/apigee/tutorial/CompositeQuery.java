@@ -24,17 +24,15 @@ import java.util.Iterator;
  * Tutorial keyspace and have already run {@link org.apigee.tutorial.CompositeDataLoader}
  *
  * Execute this class with the following invocation from the project root:
- * mvn -e exec:java -Dexec.mainClass="com.apigee.tutorial.composite.CompositeQuery"
+ * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.CompositeQuery"
  *
- * cassandra-cli:
+ * to see the whole row in the cassandra-cli:
  * list CompositeSingleRowIndex;
  *
  * @author zznate
  */
 public class CompositeQuery extends TutorialBase {
 
-  // this is the key for our index row
-  private static String key = "ALL";
   // this is the first component of the Composite for which we will look
   private static String startArg = "US";
   
@@ -65,7 +63,7 @@ public class CompositeQuery extends TutorialBase {
    */
   public void printColumnsFor(Composite start, Composite end) {
 
-    CompositeQueryIterator iter = new CompositeQueryIterator(key, start, end);
+    CompositeQueryIterator iter = new CompositeQueryIterator(CompositeDataLoader.COMPOSITE_KEY, start, end);
     System.out.printf("Printing all columns starting with %s", startArg);
     int count = 0;
     for ( HColumn<Composite,String> column : iter ) {
@@ -113,7 +111,7 @@ public class CompositeQuery extends TutorialBase {
 
       SliceQuery<String,Composite,String> sliceQuery =
         HFactory.createSliceQuery(tutorialKeyspace, StringSerializer.get(), new CompositeSerializer(), StringSerializer.get());
-      sliceQuery.setColumnFamily("CountryStateCity");
+      sliceQuery.setColumnFamily(CompositeDataLoader.CF_COMPOSITE_INDEX);
       sliceQuery.setKey(key);
 
       sliceIterator = new ColumnSliceIterator(sliceQuery, start, end, false);
