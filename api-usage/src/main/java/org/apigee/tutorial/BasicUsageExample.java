@@ -50,6 +50,6 @@ public class BasicUsageExample extends TutorialBase {
     log.info(" UUID: {}", foundRow.getUUID(42));
     log.info(" 'counter1': {}", foundRow.getCount("counter1"));
     log.info(" '1234L': {}", foundRow.getCount(1234L));
-    
+
   }
 }

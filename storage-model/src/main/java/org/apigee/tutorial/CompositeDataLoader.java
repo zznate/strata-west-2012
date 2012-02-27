@@ -1,13 +1,18 @@
 package org.apigee.tutorial;
 
+import me.prettyprint.cassandra.model.BasicColumnFamilyDefinition;
 import me.prettyprint.cassandra.serializers.CompositeSerializer;
 import me.prettyprint.cassandra.serializers.StringSerializer;
+import me.prettyprint.cassandra.service.ThriftCfDef;
 import me.prettyprint.hector.api.beans.Composite;
 import me.prettyprint.hector.api.beans.HColumn;
+import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition;
+import me.prettyprint.hector.api.ddl.ComparatorType;
 import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.mutation.Mutator;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apigee.tutorial.common.SchemaUtils;
 import org.apigee.tutorial.common.TutorialBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +32,9 @@ import java.util.concurrent.Future;
  * project root.
  *
  * Execute this class by invoking the following at the project root:
- * mvn -e exec:java -Dexec.mainClass="com.apigee.tutorial.composite.CompositeDataLoader"
+ * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.CompositeDataLoader"
  * @author zznate
  *
- * TODO copy over data file from tutorial into 'data/' directory
  */
 public class CompositeDataLoader extends TutorialBase {
   private static Logger log = LoggerFactory.getLogger(CompositeDataLoader.class);
@@ -38,11 +42,12 @@ public class CompositeDataLoader extends TutorialBase {
   private static ExecutorService exec;
   // key for static composite, First row of dynamic composite
   public static final String COMPOSITE_KEY = "ALL";
-  public static final String COUNTRY_STATE_CITY_CF = "CountryStateCity";
+  public static final String CF_COMPOSITE_INDEX = "CompositeSingleRowIndex";
 
   public static void main(String[] args) {
     long startTime = System.currentTimeMillis();
     init();
+    maybeCreateSchema();
     String fileLocation = properties.getProperty("composites.geodata.file.location","data/geodata.txt");
     BufferedReader reader;
     exec = Executors.newFixedThreadPool(5);
@@ -80,9 +85,16 @@ public class CompositeDataLoader extends TutorialBase {
   }
 
 
-  protected void maybeCreateSchema() {
-    // TODO create composite schema 'CompositeSingleRowIndex'
-
+  protected static void maybeCreateSchema() {
+    BasicColumnFamilyDefinition columnFamilyDefinition = new BasicColumnFamilyDefinition();
+    columnFamilyDefinition.setKeyspaceName(SchemaUtils.TUTORIAL_KEYSPACE_NAME);
+    columnFamilyDefinition.setName(CF_COMPOSITE_INDEX);
+    columnFamilyDefinition.setComparatorType(ComparatorType.COMPOSITETYPE);
+    columnFamilyDefinition.setComparatorTypeAlias("(UTF8Type, UTF8Type, UTF8Type)");
+    columnFamilyDefinition.setDefaultValidationClass(ComparatorType.UTF8TYPE.getClassName());
+    columnFamilyDefinition.setKeyValidationClass(ComparatorType.UTF8TYPE.getClassName());
+    ColumnFamilyDefinition cfDef = new ThriftCfDef(columnFamilyDefinition);
+    schemaUtils.maybeCreate(cfDef);
   }
 
   private static void doParse(List<String> lines, List<Future<Integer>> sums) {
@@ -108,7 +120,7 @@ public class CompositeDataLoader extends TutorialBase {
         // parse
         geoDataLine = new GeoDataLine(row);
         // assemble the insertions
-        mutator.addInsertion(COMPOSITE_KEY, COUNTRY_STATE_CITY_CF, geoDataLine.staticColumnFrom());
+        mutator.addInsertion(COMPOSITE_KEY, CF_COMPOSITE_INDEX, geoDataLine.staticColumnFrom());
         
         count++;
       }

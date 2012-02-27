@@ -25,7 +25,10 @@ import java.util.Iterator;
  *
  * Execute this class with the following invocation from the project root:
  * mvn -e exec:java -Dexec.mainClass="com.apigee.tutorial.composite.CompositeQuery"
-
+ *
+ * cassandra-cli:
+ * list CompositeSingleRowIndex;
+ *
  * @author zznate
  */
 public class CompositeQuery extends TutorialBase {

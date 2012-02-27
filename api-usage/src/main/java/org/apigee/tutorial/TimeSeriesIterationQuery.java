@@ -52,14 +52,18 @@ import java.util.Iterator;
  * section of this tutorial.
  *
  * #CQL
- * A CQL query which would retrieve the first 100 columns for this row:
- * TODO
+ * A CQL query which would retrieve the first 100 columns for this row. This currently
+ * only shows the key pending the implementation of of composite column support in CQL
+ * select * from CompositeSingleRowIndex where KEY = 'ALL';
  *
  * A CQL query to retrieve columns 1001-2000:
  * TODO
  *
  * A CQL query to retrieve all columns in 1 call
  * TODO
+ *
+ * Returning all columns from the cassandra-cli
+ *
  *
  * mvn -e exec:java -Dexec.args='[key]' -Dexec.mainClass="org.apigee.tutorial.TimeseriesIterationQuery"
  * @author zznate
