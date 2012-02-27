@@ -12,6 +12,7 @@ import me.prettyprint.cassandra.service.template.ColumnFamilyTemplate;
 import me.prettyprint.cassandra.service.template.ThriftColumnFamilyTemplate;
 import me.prettyprint.hector.api.beans.DynamicComposite;
 import me.prettyprint.hector.api.beans.HColumn;
+import me.prettyprint.hector.api.beans.HCounterColumn;
 import me.prettyprint.hector.api.exceptions.HectorException;
 import me.prettyprint.hector.api.mutation.Mutator;
 import org.apache.cassandra.thrift.*;
@@ -54,6 +55,11 @@ public class ColumnFamily {
       // key: rowkey_colname and colname: timestamp colvalue: value
       // indexingService.index(Mutator, HColumn, rowKey)
     }
+    if ( row.hasCounters() ) {
+      for ( Map.Entry<ByteBuffer, HCounterColumn<ByteBuffer>> entry : row.getCounters().entrySet() ) {
+        mutator.addCounter(row.getKeyBytes(), org.apigee.tutorial.Cassandra.COUNTER_CF_NAME, entry.getValue());
+      }
+    }
     mutator.execute();
   }
   
@@ -69,7 +75,7 @@ public class ColumnFamily {
   }
 
   public CFCursor queryCql(String cql) {
-    return new CFCursor(this,new ColumnFamilyResultWrapper(ByteBufferSerializer.get(), DynamicCompositeSerializer.get(),
+    return new CFCursor(this,new ColumnFamilyResultWrapper(ByteBufferSerializer.get(), ByteBufferSerializer.get(),
             keyspace.doExecuteOperation(new CqlOperation(this, cql))));
   }
 
@@ -87,7 +93,7 @@ public class ColumnFamily {
     @Override
     public Map<ByteBuffer,List<ColumnOrSuperColumn>> execute(Cassandra.Client cassandra) throws HectorException {
       try {
-        CqlResult result = cassandra.execute_cql_query(StringSerializer.get().toByteBuffer(cql), Compression.GZIP);
+        CqlResult result = cassandra.execute_cql_query(StringSerializer.get().toByteBuffer(cql), Compression.NONE);
         switch (result.getType()) {
           case VOID:
             return null;

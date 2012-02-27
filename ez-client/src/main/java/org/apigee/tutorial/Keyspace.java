@@ -44,9 +44,14 @@ public class Keyspace {
       }
     }
     if ( !found ) {
-      ThriftCfDef cfDef = new ThriftCfDef(keyspaceName, columnFamilyName);
-      thriftCluster.addColumnFamily(cfDef);
+      if (!Cassandra.COUNTER_CF_NAME.equals(columnFamilyName) ) {
+        ThriftCfDef cfDef = new ThriftCfDef(keyspaceName, columnFamilyName);
+        thriftCluster.addColumnFamily(cfDef);
+      } else {
+        thriftCluster.addColumnFamily(Cassandra.buildStockCfs(keyspaceName));
+      }
     }
+
     return columnFamily;
   }
 

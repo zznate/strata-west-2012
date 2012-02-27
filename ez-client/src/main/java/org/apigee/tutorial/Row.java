@@ -1,12 +1,15 @@
 package org.apigee.tutorial;
 
 import me.prettyprint.cassandra.model.HColumnImpl;
+import me.prettyprint.cassandra.model.HCounterColumnImpl;
 import me.prettyprint.cassandra.serializers.*;
 import me.prettyprint.cassandra.service.clock.MicrosecondsSyncClockResolution;
 import me.prettyprint.cassandra.utils.TimeUUIDUtils;
 import me.prettyprint.hector.api.Serializer;
 import me.prettyprint.hector.api.beans.DynamicComposite;
 import me.prettyprint.hector.api.beans.HColumn;
+import me.prettyprint.hector.api.beans.HCounterColumn;
+import org.apache.cassandra.utils.ByteBufferUtil;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -24,6 +27,9 @@ public class Row {
   private String key;
   private Map<ByteBuffer,HColumn<ByteBuffer, ByteBuffer>> columnMap =
     new HashMap<ByteBuffer,HColumn<ByteBuffer, ByteBuffer>>();
+  private Map<ByteBuffer,HCounterColumn<ByteBuffer>> counterMap =
+      new HashMap<ByteBuffer,HCounterColumn<ByteBuffer>>();
+
   private static MicrosecondsSyncClockResolution clockResolution = new MicrosecondsSyncClockResolution();
   private static final TypeInferringSerializer tis = TypeInferringSerializer.get();
   private ColumnFamily columnFamily;
@@ -41,9 +47,17 @@ public class Row {
     return this;
   }
 
-  public void increment(Object columnName, long value) {
+  public Row increment(Object columnName, long value) {
     // add this to the 'application countrs' CF under this key
-
+    ByteBuffer colName = tis.toByteBuffer(columnName);
+    HCounterColumn<ByteBuffer> col = counterMap.get(colName);
+    if ( col == null ) {
+      col = new HCounterColumnImpl<ByteBuffer>(colName, value, ByteBufferSerializer.get());
+    } else {
+      col.setValue(col.getValue() + value);
+    }
+    counterMap.put(colName,col);
+    return this;
   }
    
   public Row put(Object columnName, Object columnValue) {
@@ -56,9 +70,16 @@ public class Row {
     return this;
   }
 
+  public boolean hasCounters() {
+    return this.counterMap.size() > 0;
+  }
+
   public long getCount(Object columnName) {
     // execute a CQL counter query independent of the colmap
-    return 0;
+    String cql = "Select '%s' from %s where KEY = %s";
+    CFCursor cursor = columnFamily.queryCql(String.format(cql, ByteBufferUtil.bytesToHex(tis.toByteBuffer(columnName)),
+            Cassandra.COUNTER_CF_NAME, this.key));
+    return cursor.next().get(LongSerializer.get(), tis.toByteBuffer(columnName));
   }
     
   public boolean hasColumns() {
@@ -108,10 +129,15 @@ public class Row {
   ByteBuffer getKeyBytes() {
     return StringSerializer.get().toByteBuffer(getKey());
   }
+
   Map<ByteBuffer,HColumn<ByteBuffer, ByteBuffer>> getColumns() {
     return columnMap;
   }
-    
+
+  Map<ByteBuffer,HCounterColumn<ByteBuffer>> getCounters() {
+    return counterMap;
+  }
+
   List<ByteBuffer> getColumnsForQuery() {
     List<ByteBuffer> cols = new ArrayList<ByteBuffer>(columnMap.size());
     for (ByteBuffer buf : columnMap.keySet()) {

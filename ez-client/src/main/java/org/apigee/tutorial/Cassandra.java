@@ -9,6 +9,7 @@ import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition;
 import me.prettyprint.hector.api.ddl.ColumnType;
 import me.prettyprint.hector.api.ddl.ComparatorType;
 import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
+import me.prettyprint.hector.api.exceptions.HectorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ public class Cassandra {
   private final CassandraHostConfigurator cassandraHostConfigurator;
   private final ThriftCluster thriftCluster;
 
-  final String COUNTER_CF_NAME = "EzClientCountersCf";
+  public static final String COUNTER_CF_NAME = "EzClientCountersCf";
 
   /**
    * Automatically connect to a Cassandra instance running the Thrift API
@@ -81,25 +82,38 @@ public class Cassandra {
   }
 
   /**
-   * Get a Keyspace, creating it if necessary
+   * Get a Keyspace, creating it if necessary, creating also the counter cf
+   * if needed
    * @param keyspaceName
    * @return
    */
   public Keyspace getKeyspace(String keyspaceName) {
     Keyspace keyspace = new Keyspace(keyspaceName, thriftCluster);
     if (! getKeyspaces().contains(keyspace) ) {
-      buildEzClientKeyspace(keyspaceName);
+      try {
+        buildEzClientKeyspace(keyspaceName);
+      } catch (HectorException he) {
+        he.printStackTrace();
+      }
+    } if ( keyspace.getColumnFamily(COUNTER_CF_NAME) == null ) {
+      thriftCluster.addColumnFamily(buildStockCfs(keyspaceName));
     }
+    log.info("Found counter CF"+keyspace.getColumnFamily(COUNTER_CF_NAME));
     return keyspace;
   }
 
   private void buildEzClientKeyspace(String keyspaceName) {
     log.info("attempting keyspace create");
+    thriftCluster.addKeyspace(new ThriftKsDef(keyspaceName, "SimpleStrategy",
+            1, Arrays.asList(buildStockCfs(keyspaceName))), true);
+    log.info("keyspace created");
+  }
+
+  static ColumnFamilyDefinition buildStockCfs(String keyspaceName) {
     ThriftCfDef cfDef = new ThriftCfDef(keyspaceName, COUNTER_CF_NAME);
+    cfDef.setKeyValidationClass(ComparatorType.UTF8TYPE.getClassName());
     cfDef.setDefaultValidationClass(ComparatorType.COUNTERTYPE.getClassName());
-    List<ColumnFamilyDefinition> cfDefs = new ArrayList<ColumnFamilyDefinition>();
-    cfDefs.add(cfDef);
-    thriftCluster.addKeyspace(new ThriftKsDef(keyspaceName, "SimpleStrategy", 1, cfDefs), true);
+    return cfDef;
   }
   
   public List<Keyspace> getKeyspaces() {

@@ -25,8 +25,9 @@ public class ColumnFamilyTest extends BaseCassandraTest {
     UUID id = TimeUUIDUtils.getUniqueTimeUUIDinMillis();
     row.put(42, id);
     row.put(id, "uuid col name");
-    
-    
+    row.increment("counter1",4).increment(1234L,1).increment("counter1",1);
+
+
     columnFamily.insert(row);   
 
     CFCursor cursor = columnFamily.query(row);
@@ -38,5 +39,7 @@ public class ColumnFamilyTest extends BaseCassandraTest {
     assertEquals(id,foundRow.getUUID(42));
     assertEquals("uuid col name", foundRow.getString(id));
     assertNull(foundRow.getString("didnt store this"));
+    assertEquals(5,foundRow.getCount("counter1"));
+    assertEquals(1,foundRow.getCount(1234L));
   }
 }
