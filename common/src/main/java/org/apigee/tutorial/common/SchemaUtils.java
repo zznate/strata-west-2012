@@ -6,6 +6,8 @@ import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition;
 import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
 
+import java.util.List;
+
 /**
  * Common utility class for checking schema existence and
  * creating if necessary.
@@ -23,6 +25,12 @@ public class SchemaUtils {
   }
 
   public boolean cfExists(String columnFamilyNme) {
+    KeyspaceDefinition ksDef = cluster.describeKeyspace(TUTORIAL_KEYSPACE_NAME);
+    for ( ColumnFamilyDefinition cfDef : ksDef.getCfDefs() ) {
+      if (cfDef.getName().equals(columnFamilyNme)) {
+        return true;
+      }
+    }
     return false;
   }
 
