@@ -1,8 +1,10 @@
 package org.apigee.tutorial.common;
 
 import me.prettyprint.cassandra.service.ThriftCfDef;
+import me.prettyprint.cassandra.service.ThriftKsDef;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition;
+import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
 
 /**
  * Common utility class for checking schema existence and
@@ -27,6 +29,13 @@ public class SchemaUtils {
   public void maybeCreate(ColumnFamilyDefinition cfDef) {
     if ( cfExists(cfDef.getName() ) ) {
       return;
+    }
+    cluster.addColumnFamily(cfDef);
+  }
+
+  public void maybeCreateKeyspace() {
+    if ( cluster.describeKeyspace(TUTORIAL_KEYSPACE_NAME) == null ) {
+      cluster.addKeyspace(new ThriftKsDef(TUTORIAL_KEYSPACE_NAME));
     }
   }
 

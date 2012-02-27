@@ -4,6 +4,7 @@ import me.prettyprint.cassandra.model.ConfigurableConsistencyLevel;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.HConsistencyLevel;
 import me.prettyprint.hector.api.Keyspace;
+import me.prettyprint.hector.api.exceptions.HectorException;
 import me.prettyprint.hector.api.factory.HFactory;
 
 import java.io.IOException;
@@ -15,24 +16,39 @@ public abstract class TutorialBase {
   protected static Properties properties;
   protected static SchemaUtils schemaUtils;
 
-  protected static void init() {
+  protected static void init(boolean skipProps) {
     properties = new Properties();
-    try {
-      properties.load(TutorialBase.class.getResourceAsStream("/tutorial.properties"));
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
+    if ( !skipProps) {
+
+      try {
+        properties.load(TutorialBase.class.getResourceAsStream("/tutorial.properties"));
+      } catch (IOException ioe) {
+        ioe.printStackTrace();
+      }
     }
     // To modify the default ConsistencyLevel of QUORUM, create a
     // me.prettyprint.hector.api.ConsistencyLevelPolicy and use the overloaded form:
     // tutorialKeyspace = HFactory.createKeyspace("Tutorial", tutorialCluster, consistencyLevelPolicy);
     // see also me.prettyprint.tutorial.model.ConfigurableConsistencyLevelPolicy[Test] for details
+    try {
+      tutorialCluster = HFactory.getOrCreateCluster(properties.getProperty("cluster.name", "TutorialCluster"),
+              properties.getProperty("cluster.hosts", "127.0.0.1:9160"));
+      schemaUtils = new SchemaUtils(tutorialCluster);
+      schemaUtils.maybeCreateKeyspace();
+      ConfigurableConsistencyLevel ccl = new ConfigurableConsistencyLevel();
+      ccl.setDefaultReadConsistencyLevel(HConsistencyLevel.ONE);
+      tutorialKeyspace = HFactory.createKeyspace(SchemaUtils.TUTORIAL_KEYSPACE_NAME, tutorialCluster, ccl);
 
-    tutorialCluster = HFactory.getOrCreateCluster(properties.getProperty("cluster.name", "TutorialCluster"),
-            properties.getProperty("cluster.hosts", "127.0.0.1:9160"));
-    ConfigurableConsistencyLevel ccl = new ConfigurableConsistencyLevel();
-    ccl.setDefaultReadConsistencyLevel(HConsistencyLevel.ONE);
-    tutorialKeyspace = HFactory.createKeyspace(properties.getProperty("tutorial.keyspace", "Tutorial"), tutorialCluster, ccl);
-    schemaUtils = new SchemaUtils(tutorialCluster);
+    } catch(HectorException he) {
+      he.printStackTrace();
+    }
+
+  }
+
+
+
+  protected static void init() {
+    init(true);
   }
 
 }
