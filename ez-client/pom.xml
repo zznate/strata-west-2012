@@ -3,14 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
+    <groupId>org.apigee.tutorial</groupId>
+    <artifactId>strata-west-2012</artifactId>
+    <version>1.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.apigee.tutorial</groupId>
   <artifactId>ez-client</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
   <name>Cassandra EZ Client</name>
   <description>The code examples from the tutorial session: Building Applications with Apache Cassandra (http://strataconf.com/strata2012/public/schedule/detail/22369) presented at the O'Reilly Strata Conference on February 29th, 2012. This module is the simple client built up around some best practices.</description>
@@ -23,28 +23,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <developers>
-    <developer>
-      <id>zznate</id>
-      <name>Nate McCall</name>
-      <roles>
-        <role>packager</role>
-	    <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
-
-  <scm>
-    <connection>scm:git:https://github.com/zznate/strata-west-2012/</connection>
-    <developerConnection>scm:githttps://github.com/zznate/strata-west-2012/</developerConnection>
-    <url>https://github.com/zznate/strata-west-2012</url>
-  </scm>
-  <issueManagement>
-    <system>github.com</system>
-    <url>https://github.com/zznate/strata-west-2012/issues/list</url>
-  </issueManagement>
-
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.outputEncoding>UTF-8</project.build.outputEncoding>

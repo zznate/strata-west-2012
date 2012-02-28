@@ -3,16 +3,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apigee.tutorial</groupId>
-    <artifactId>strata-west-2012</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
   </parent>
 
   <groupId>org.apigee.tutorial</groupId>
-  <artifactId>strata-api-usage</artifactId>
+  <artifactId>strata-west-2012</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-  <name>Api Usage</name>
-  <description>The code examples from the tutorial session: Building Applications with Apache Cassandra (http://strataconf.com/strata2012/public/schedule/detail/22369) presented at the O'Reilly Strata Conference on February 29th, 2012. This is the API Usage section.</description>
+  <name>Building Applications with Apache Cassandra</name>
+  <description>The code examples from the tutorial session: Building Applications with Apache Cassandra (http://strataconf.com/strata2012/public/schedule/detail/22369) presented at the O'Reilly Strata Conference on February 28th, 2012.</description>
   <url>https://github.com/zznate/strata-west-2012</url>
   <inceptionYear>2012</inceptionYear>
   <licenses>
@@ -50,6 +52,14 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <modules>
+    <module>api-usage</module>
+    <module>common</module>
+    <module>storage-model</module>
+    <module>webapp</module>
+    <module>ez-client</module>    
+  </modules>
+
   <dependencies>
     <dependency>
       <groupId>me.prettyprint</groupId>
@@ -67,16 +77,6 @@
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.6.1</version>
     </dependency>
-    <dependency>
-      <groupId>org.apigee.tutorial.common</groupId>
-      <artifactId>common</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-      <dependency>
-        <groupId>org.apigee.tutorial</groupId>
-        <artifactId>ez-client</artifactId>
-        <version>1.0-SNAPSHOT</version>
-      </dependency>
   </dependencies>
  
 </project>
