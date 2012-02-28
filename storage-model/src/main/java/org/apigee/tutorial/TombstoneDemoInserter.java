@@ -16,17 +16,14 @@ import java.util.UUID;
  * Creates a few static rows of data modelling users. The interesting part takes place in
  * TombstoneDemoQuery.
  *
- * #CQL
- * To do a batch insert via CQL, use the following syntax:
  *
- * #NOTE
- * Inserting timeseries data is one of the places where CQL gets a bit cumbersome.
  *
+ * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.TombstoneDemoInserter"
  * @author zznate
  */
 public class TombstoneDemoInserter extends TutorialBase {
 
-  private Logger log = LoggerFactory.getLogger(TombstoneDemoInserter.class);
+  private static Logger log = LoggerFactory.getLogger(TombstoneDemoInserter.class);
 
   public static final String CF_TOMBSTONE_DEMO = "TombstoneDemo";
 
@@ -43,10 +40,11 @@ public class TombstoneDemoInserter extends TutorialBase {
     Row row;
     for(int x=0; x<10; x++) {
       row = new Row();
-      row.setKey("key"+x);
+      row.setKey("key_"+x);
       row.put("k"+x+"_column1", "value1");
       row.put("k"+x+"_column2","value2");
       columnFamily.insert(row);
+      log.info("added row for key {}",row.getKey());
     }
   }
 
