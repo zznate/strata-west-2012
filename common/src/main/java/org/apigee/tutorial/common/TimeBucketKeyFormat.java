@@ -24,12 +24,13 @@ public enum TimeBucketKeyFormat {
   public static final String ALL_KEY = "__ALL__";
 
   FastDateFormat formatter;
-  SimpleDateFormat sdf;
+  final String format;
 
   TimeBucketKeyFormat(String format) {
+    this.format = format;
     if ( !StringUtils.equals(format, ALL_KEY)) {
       this.formatter = FastDateFormat.getInstance(format, TimeZone.getTimeZone("GMT"));
-      this.sdf = new SimpleDateFormat(format);
+
     }
   }
 
@@ -56,8 +57,9 @@ public enum TimeBucketKeyFormat {
       throw new IllegalArgumentException("Can't parse key for " + ALL_KEY);
     }
     try {
+      SimpleDateFormat sdf = new SimpleDateFormat(format);
       return sdf.parse(bucketKey).getTime();
-    } catch (ParseException pe) {
+    } catch (Exception e) {
       throw new IllegalArgumentException("could not parse bucket key: " + bucketKey);
     }
   }

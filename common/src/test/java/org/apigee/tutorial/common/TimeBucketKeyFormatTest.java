@@ -34,4 +34,10 @@ public class TimeBucketKeyFormatTest {
     date = format.formatDate(TST_DATE);
     assertEquals("2012_02_24_17_36_01",date);
   }
+
+  @Test
+  public void testParse() {
+    TimeBucketKeyFormat format = TimeBucketKeyFormat.MINUTE;
+    format.parse("2012_02_28_01_09");
+  }
 }

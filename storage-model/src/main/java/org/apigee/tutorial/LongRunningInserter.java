@@ -30,15 +30,18 @@ import java.util.concurrent.*;
  *
  * Various was to see what is happening:
  * Column Family healt and workload statistics via 'nodetool' CLI:
- * nodetool -h localhost cfstats
+ * ./bin/nodetool -h localhost cfstats
+ *
+ * To force some flushing, you can invoke flush directy:
+ * ./bin/nodetool -h localhost flush TutorialKeyspace LongRunningInsert
  *
  * Thread pool usage statistics also via 'nodetool' CLI:
- * nodetool -h localhost tpstats
+ * ./bin/nodetool -h localhost tpstats
  *
  * DataStax OpsCenter:
  * TODO add screen instructions
  *
- * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.TimeseriesInserter"
+ * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.LongRunningInserter"
  * @author zznate
  */
 public class LongRunningInserter extends TutorialBase {
@@ -53,16 +56,13 @@ public class LongRunningInserter extends TutorialBase {
     init();
     maybeCreateSchema();
     long startTime = System.currentTimeMillis();
-    init();
     exec = Executors.newFixedThreadPool(3);
 
     try {
 
       List<Future<Integer>> futures = new ArrayList<Future<Integer>>();
 
-      // request 10 invocation of RowInserter
-      // each invocation creates 5 rows, thus we have 50 rows of 1000 columns each
-      for (int x = 0; x < 100; x++) {
+      for (int x = 0; x < 200; x++) {
         futures.add(exec.submit(new LongRunningInserter().new RowInserter()));
         TimeUnit.SECONDS.sleep(random.nextInt(4));
       }
