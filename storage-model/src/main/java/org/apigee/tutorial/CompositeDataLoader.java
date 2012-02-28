@@ -31,6 +31,11 @@ import java.util.concurrent.Future;
  * Multi-threaded bulk loader for geo data located in the data directory of the
  * project root.
  *
+ * This class inserts the columns for a single index row over within ALL.
+ * This approach could be used when you had a finite number of static columns where
+ * you needed a flexible searching mechanism (via slices). See CompositeQuery for
+ * more details on query granularity.
+ *
  * Execute this class by invoking the following at the project root:
  * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.CompositeDataLoader"
  * @author zznate

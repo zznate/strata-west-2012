@@ -29,6 +29,10 @@ import java.util.Iterator;
  * to see the whole row in the cassandra-cli:
  * list CompositeSingleRowIndex;
  *
+ * CQL
+ * Currently CQL will only display the key for composite columns. See:
+ * https://issues.apache.org/jira/browse/CASSANDRA-3680 for details
+ *
  * @author zznate
  */
 public class CompositeQuery extends TutorialBase {
