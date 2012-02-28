@@ -1,5 +1,12 @@
 package org.springframework.samples.mvc.basic.account;
 
+import me.prettyprint.cassandra.service.template.ColumnFamilyResult;
+import me.prettyprint.cassandra.service.template.ColumnFamilyTemplate;
+import me.prettyprint.cassandra.service.template.ColumnFamilyUpdater;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 
@@ -8,36 +15,40 @@ import java.util.List;
  */
 public class AccountDao {
 
-  public Account get(long id) {
+  private ColumnFamilyTemplate<Long,String> columnFamilyTemplate;
 
-    return null;
+  public void setColumnFamilyTemplate(ColumnFamilyTemplate cft) {
+    this.columnFamilyTemplate = columnFamilyTemplate;
+  }
+
+  public Account get(long id) {
+    ColumnFamilyResult<Long,String> result = columnFamilyTemplate.queryColumns(id);
+    Account account = new Account();
+    account.setId(result.getKey());
+    account.setBalance(new BigDecimal(result.getDouble("balance")));
+    account.setName(result.getString("name"));
+    account.setRenewalDate(result.getDate("renewalDate"));
+    return account;
   }
 
   public void save(Account account) {
-    // for each property, add a mutation, empty[] for null
-    // ez-client for each property
+    ColumnFamilyUpdater<Long,String> updater = columnFamilyTemplate.createUpdater(account.getId());
+    updater.setDouble("balance",account.getBalance().doubleValue());
+    updater.setString("name",account.getName());
+    updater.setDate("renewalDate",account.getRenewalDate());
+    columnFamilyTemplate.update(updater);
   }
 
   public void delete(Account account) {
-    // cf.delete();
+    columnFamilyTemplate.deleteRow(account.getId());
   }
 
-  public List<Account> getAccounts() {
-    return null;
-  }
 
   public Iterator iterator(long startOnId, int limit) {
     // build slice query here and pass it in?
     return new AccountIterator();
   }
-  
-  public void upsertFromEm(Account account) {
 
-  }
-
-  public Account getFromEm(long id) {
-    return null;
-  }
 
   class AccountIterator implements Iterator<Account>,Iterable<Account> {
 

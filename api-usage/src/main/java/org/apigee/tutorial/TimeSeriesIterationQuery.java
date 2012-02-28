@@ -77,7 +77,7 @@ public class TimeseriesIterationQuery extends TutorialBase {
     verifySchema();
     String key;
     if (args == null || args.length == 0 || StringUtils.isBlank(args[0])) {
-      //bd1f1500-f92b-1a51-813e-68a86d54ced2
+      //UUID key in the format similar to: bd1f1500-f92b-1a51-813e-68a86d54ced2
       throw new IllegalArgumentException("Could not read key from arguments. Please use: " +
               "mvn -e exec:java -Dexec.args='[key]' -Dexec.mainClass=\"org.apigee.tutorial.TimeseriesIterationQuery\"");
     }
@@ -105,8 +105,11 @@ public class TimeseriesIterationQuery extends TutorialBase {
     }
   }
 
+  /**
+   * An iterator implementation is a clean way to pass back up to the caller
+   * the concept of seemlessly scanning a wide row in an efficient manner.
+   */
   class TimeseriesIterator implements Iterable<HColumn<Long,Long>> {
-
 
     private ColumnSliceIterator<String,Long,Long> sliceIterator;
 
