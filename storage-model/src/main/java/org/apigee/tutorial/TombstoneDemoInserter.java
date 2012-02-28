@@ -2,12 +2,15 @@ package org.apigee.tutorial;
 
 import me.prettyprint.cassandra.model.BasicColumnFamilyDefinition;
 import me.prettyprint.cassandra.service.ThriftCfDef;
+import me.prettyprint.cassandra.utils.TimeUUIDUtils;
 import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition;
 import me.prettyprint.hector.api.ddl.ComparatorType;
 import org.apigee.tutorial.common.SchemaUtils;
 import org.apigee.tutorial.common.TutorialBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 /**
  * Creates a few static rows of data modelling users. The interesting part takes place in
@@ -27,11 +30,28 @@ public class TombstoneDemoInserter extends TutorialBase {
 
   public static final String CF_TOMBSTONE_DEMO = "TombstoneDemo";
 
-  protected void maybeCreateSchema() {
-    // TombstoneDemo
-        // TODO timeseries CF creation 'TimeseriesSingleRow'
+  public static void main(String[] args) {
+    init();
+    maybeCreateSchema();
+
+    Cassandra cassandra = new Cassandra(tutorialCluster);
+
+    Keyspace keyspace = cassandra.getKeyspace(SchemaUtils.TUTORIAL_KEYSPACE_NAME);
+
+    ColumnFamily columnFamily = keyspace.getColumnFamily(CF_TOMBSTONE_DEMO);
+
+    Row row;
+    for(int x=0; x<10; x++) {
+      row = new Row();
+      row.setKey("key"+x);
+      row.put("k"+x+"_column1", "value1");
+      row.put("k"+x+"_column2","value2");
+      columnFamily.insert(row);
+    }
+  }
+
+  protected static void maybeCreateSchema() {
     BasicColumnFamilyDefinition columnFamilyDefinition = new BasicColumnFamilyDefinition();
-    // TODO static in schemaUtils
     columnFamilyDefinition.setKeyspaceName(SchemaUtils.TUTORIAL_KEYSPACE_NAME);
     columnFamilyDefinition.setName(CF_TOMBSTONE_DEMO);
     columnFamilyDefinition.setComparatorType(ComparatorType.UTF8TYPE);
@@ -41,14 +61,5 @@ public class TombstoneDemoInserter extends TutorialBase {
     schemaUtils.maybeCreate(cfDef);
   }
 
-  private void createRows() {
-    // create 3 'user' rows
 
-    // - string key
-    // - name
-    // - email
-    // - city
-
-
-  }
 }
