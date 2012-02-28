@@ -65,7 +65,7 @@ import java.util.Iterator;
  * Returning all columns from the cassandra-cli
  *
  *
- * mvn -e exec:java -Dexec.args='[key]' -Dexec.mainClass="org.apigee.tutorial.TimeseriesIterationQuery"
+ * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.TimeseriesIterationQuery"
  * @author zznate
  */
 public class TimeseriesIterationQuery extends TutorialBase {
@@ -75,13 +75,7 @@ public class TimeseriesIterationQuery extends TutorialBase {
   public static void main(String [] args) {
     init();
     verifySchema();
-    String key;
-    if (args == null || args.length == 0 || StringUtils.isBlank(args[0])) {
-      //UUID key in the format similar to: bd1f1500-f92b-1a51-813e-68a86d54ced2
-      throw new IllegalArgumentException("Could not read key from arguments. Please use: " +
-              "mvn -e exec:java -Dexec.args='[key]' -Dexec.mainClass=\"org.apigee.tutorial.TimeseriesIterationQuery\"");
-    }
-    key = args[0];
+    String key = "myKey";
     long timer = System.currentTimeMillis();
     TimeseriesIterationQuery tiq = new TimeseriesIterationQuery();
     tiq.printColumns(key);

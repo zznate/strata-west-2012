@@ -17,16 +17,13 @@ import org.slf4j.LoggerFactory;
  * - Timestamp mis-match: insert a column with an older timestamp, column wont apply
  *
  * #CLI output for list of columns
- * TODO
- *
- * #CQL for insert:
- * TODO
+ * list TombstoneDemo;
  *
  * #CQL for all rows:
- * TODO
+ * select * from TombstoneDemo;
  *
  * #CQL for single row:
- * TODO
+ * select * from TombstoneDemo where KEY = key_1;
  *
  * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.TombstoneDemoQuery"
  * @author zznate
@@ -46,7 +43,6 @@ public class TombstoneDemoQuery extends TutorialBase {
     Keyspace keyspace = cassandra.getKeyspace(SchemaUtils.TUTORIAL_KEYSPACE_NAME);
 
     ColumnFamily columnFamily = keyspace.getColumnFamily(TombstoneDemoInserter.CF_TOMBSTONE_DEMO);
-
 
     Row row = new Row().setKey("key_1");
     CFCursor result = columnFamily.query(row);

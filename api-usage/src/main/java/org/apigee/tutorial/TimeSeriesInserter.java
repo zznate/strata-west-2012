@@ -60,7 +60,9 @@ public class TimeseriesInserter extends TutorialBase {
 
       List<Future<Integer>> futures = new ArrayList<Future<Integer>>();
       // Generate the TIME UUID key we will use for this row:
-      String myKey = TimeUUIDUtils.getTimeUUID(tutorialKeyspace.createClock()).toString();
+      // String myKey = TimeUUIDUtils.getTimeUUID(tutorialKeyspace.createClock()).toString();
+      // we'll use a simple key for convenience though
+      String myKey = "myKey";
       log.info("Generated key: {}", myKey);
       // request 200 invocation of RowInserter
       // each invocation creates 5000 columns, so we get a 1 million column "wide" row

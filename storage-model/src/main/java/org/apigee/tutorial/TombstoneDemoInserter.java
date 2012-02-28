@@ -10,12 +10,10 @@ import org.apigee.tutorial.common.TutorialBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.UUID;
 
 /**
  * Creates a few static rows of data modelling users. The interesting part takes place in
  * TombstoneDemoQuery.
- *
  *
  *
  * mvn -e exec:java -Dexec.mainClass="org.apigee.tutorial.TombstoneDemoInserter"
