@@ -5,7 +5,7 @@ import org.apigee.tutorial.common.TutorialUsageException;
 
 /**
  *
- * mvn -e exec:java -Dexec.args='[key]' -Dexec.mainClass="org.apigee.tutorial.BucketingTimeseriesQuery"
+ * mvn -e exec:java -Dexec.args='[key]' -Dexec.mainClass="org.apigee.tutorial.BucketingTimeSeriesQuery"
  * @author zznate
  */
 public class BucketingTimeSeriesQuery extends TutorialBase {
