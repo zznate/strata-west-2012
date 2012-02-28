@@ -40,9 +40,14 @@ public class ColumnFamily {
           ByteBufferSerializer.get());
   }
 
-  public void index(Object columnName, String indexName) {
-    // if hasExtension(extType.INDEX, indexName) is false, create the index
+  public void delete(Row row) {
+    columnFamilyTemplate.deleteRow(row.getKeyBytes());
+  }
 
+  public void delete(Iterable<Row> rows) {
+    for (Row row : rows ) {
+      delete(row);
+    }
   }
   
   public void insert(Row row) {

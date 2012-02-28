@@ -1,14 +1,9 @@
 package org.apigee.tutorial;
 
 import me.prettyprint.cassandra.serializers.StringSerializer;
-import me.prettyprint.hector.api.beans.*;
-import me.prettyprint.hector.api.beans.Row;
 import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.mutation.Mutator;
-import me.prettyprint.hector.api.query.QueryResult;
-import me.prettyprint.hector.api.query.RangeSlicesQuery;
-import me.prettyprint.hector.api.query.SliceQuery;
-import org.apache.commons.lang.StringUtils;
+import org.apigee.tutorial.common.SchemaUtils;
 import org.apigee.tutorial.common.TutorialBase;
 import org.apigee.tutorial.common.TutorialUsageException;
 import org.slf4j.Logger;
@@ -45,53 +40,44 @@ public class TombstoneDemoQuery extends TutorialBase {
   public static void main(String[] args) {
     init();
     verifySchema();
-    tutorialCluster.truncate(tutorialKeyspace.getKeyspaceName(), TombstoneDemoInserter.CF_TOMBSTONE_DEMO);
-    Mutator<String> mutator = HFactory.createMutator(tutorialKeyspace, stringSerializer);
 
-    for (int i = 0; i < 10; i++) {
-        if ( i % 2 == 0 ) continue;
-        mutator.addDeletion("key_"+i, TombstoneDemoInserter.CF_TOMBSTONE_DEMO, null, stringSerializer);
-    }
-    mutator.execute();
-    RangeSlicesQuery<String, String, String> rangeSlicesQuery =
-        HFactory.createRangeSlicesQuery(tutorialKeyspace, stringSerializer, stringSerializer, stringSerializer);
-    rangeSlicesQuery.setColumnFamily(TombstoneDemoInserter.CF_TOMBSTONE_DEMO);
-    rangeSlicesQuery.setKeys("", "");
-    rangeSlicesQuery.setRange("", "", false, 3);
-    rangeSlicesQuery.setRowCount(10);
+    Cassandra cassandra = new Cassandra(tutorialCluster);
 
-    QueryResult<OrderedRows<String, String, String>> result = rangeSlicesQuery.execute();
-    OrderedRows<String, String, String> orderedRows = result.get();
-    printRowOutput(orderedRows);
+    Keyspace keyspace = cassandra.getKeyspace(SchemaUtils.TUTORIAL_KEYSPACE_NAME);
+
+    ColumnFamily columnFamily = keyspace.getColumnFamily(TombstoneDemoInserter.CF_TOMBSTONE_DEMO);
+
+
+    Row row = new Row().setKey("key_1");
+    CFCursor result = columnFamily.query(row);
+
+    printRow(result.next());
+
+    columnFamily.delete(row);
+
+    result = columnFamily.query(row);
+
+    printRow(result.next());
+
+    row.put("column1","some other value");
+    columnFamily.insert(row);
+
+    result = columnFamily.query(row);
+
+    printRow(result.next());
+
   }
 
-  private static void printRowOutput(OrderedRows<String,String,String> orderedRows) {
-    for (Row<String, String, String> row : orderedRows) {
-        int keyNum = Integer.valueOf(StringUtils.substringAfterLast(row.getKey(),"_"));
-        log.info("+-----------------------------------");
-        if ( keyNum % 2 == 0 ) {
-            log.info("| result key:" + row.getKey() + " which should have values: " + row.getColumnSlice());
-        } else {
-            log.info("| TOMBSTONED result key:" + row.getKey() + " has values: " + row.getColumnSlice());
-        }
-        SliceQuery<String, String, String> q =
-                HFactory.createSliceQuery(tutorialKeyspace, stringSerializer, stringSerializer, stringSerializer);
-        q.setColumnFamily(TombstoneDemoInserter.CF_TOMBSTONE_DEMO);
-        q.setRange("", "", false, 3);
-        q.setKey(row.getKey());
-
-        QueryResult<ColumnSlice<String, String>> r = q.execute();
-        log.info("|-- called directly via get_slice, the value is: " + r);
-        // For a tombstone, you just get a null back from ColumnQuery
-        log.info("|-- try the first column via getColumn: " + HFactory.createColumnQuery(tutorialKeyspace,
-                stringSerializer, stringSerializer, stringSerializer)
-                .setColumnFamily(TombstoneDemoInserter.CF_TOMBSTONE_DEMO)
-                .setKey(row.getKey()).setName("key_0").execute());
-
+  private static void printRow(Row row) {
+    log.info("+--------- Row: {} ---------------", row.getKey());
+    if ( row.hasColumns() ) {
+      log.info("| column1 = {}",row.getString("column1"));
+      log.info("| column2 = {}",row.getString("column2"));
+    } else {
+      log.info("| TOMBSTONED ");
     }
+    log.info("+-----------------------------------");
   }
-
-
 
   protected static void verifySchema() {
     if (!schemaUtils.cfExists(TombstoneDemoInserter.CF_TOMBSTONE_DEMO)) {

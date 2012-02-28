@@ -41,8 +41,8 @@ public class TombstoneDemoInserter extends TutorialBase {
     for(int x=0; x<10; x++) {
       row = new Row();
       row.setKey("key_"+x);
-      row.put("k"+x+"_column1", "value1");
-      row.put("k"+x+"_column2","value2");
+      row.put("column1", "value1");
+      row.put("column2","value2");
       columnFamily.insert(row);
       log.info("added row for key {}",row.getKey());
     }
