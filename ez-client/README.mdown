@@ -55,10 +55,10 @@ EzClient also supports counters on arbitrary rows:
 
 > Row row = new Row();
 > row.put("colname","some value");
-> row.increment("hits",1);
+> row.increment("hits",1);  
 
 The astute observer will note that you usually cant do this in a single Cassandra column family (counter-type column families are enabled by setting the default_validator class to CounterType).
-EzClient works around this by maintaining a separate column family (one per keyspace created) where counters are stored under the same row key used by the row.  
+EzClient works around this by maintaining a separate column family (one per keyspace created) where counters are stored under the same row key used by the row.
 
 
 
