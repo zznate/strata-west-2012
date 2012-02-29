@@ -60,4 +60,8 @@
         <constructor-arg ref="consistencyLevelPolicy"/>
     </bean>
 
+    <bean id="accountDao" class="org.springframework.samples.mvc.basic.account.AccountDao">
+        <property name="keyspace" ref="keyspace"/>
+    </bean>
+
 </beans>

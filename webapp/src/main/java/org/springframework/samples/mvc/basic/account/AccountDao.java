@@ -1,12 +1,24 @@
 package org.springframework.samples.mvc.basic.account;
 
+import me.prettyprint.cassandra.serializers.ByteBufferSerializer;
+import me.prettyprint.cassandra.serializers.LongSerializer;
+import me.prettyprint.cassandra.serializers.StringSerializer;
+import me.prettyprint.cassandra.service.ColumnSliceIterator;
 import me.prettyprint.cassandra.service.template.ColumnFamilyResult;
 import me.prettyprint.cassandra.service.template.ColumnFamilyTemplate;
 import me.prettyprint.cassandra.service.template.ColumnFamilyUpdater;
+import me.prettyprint.cassandra.service.template.ThriftColumnFamilyTemplate;
+import me.prettyprint.hector.api.Keyspace;
+import me.prettyprint.hector.api.beans.HColumn;
+import me.prettyprint.hector.api.factory.HFactory;
+import me.prettyprint.hector.api.query.RangeSlicesQuery;
+import me.prettyprint.hector.api.query.SliceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,9 +28,12 @@ import java.util.List;
 public class AccountDao {
 
   private ColumnFamilyTemplate<Long,String> columnFamilyTemplate;
+  private Keyspace keyspace;
 
-  public void setColumnFamilyTemplate(ColumnFamilyTemplate cft) {
-    this.columnFamilyTemplate = columnFamilyTemplate;
+  public AccountDao(Keyspace keyspace) {
+    this.columnFamilyTemplate = new ThriftColumnFamilyTemplate<Long, String>(keyspace,"Accounts",
+            LongSerializer.get(), StringSerializer.get());
+    this.keyspace = keyspace;
   }
 
   public Account get(long id) {
@@ -44,37 +59,29 @@ public class AccountDao {
   }
 
 
-  public Iterator iterator(long startOnId, int limit) {
-    // build slice query here and pass it in?
-    return new AccountIterator();
+  public List<Account> getAccounts() {
+   return null;
   }
 
 
-  class AccountIterator implements Iterator<Account>,Iterable<Account> {
+
+  class AccountIterator implements Iterable<HColumn<String,ByteBuffer>> {
+    private ColumnSliceIterator<Long,String,ByteBuffer> columnSliceIterator;
 
     public AccountIterator() {
-      // create columnSliceIterator
+      SliceQuery<Long,String,ByteBuffer> sliceQuery =
+              HFactory.createSliceQuery(keyspace, LongSerializer.get(), StringSerializer.get(), ByteBufferSerializer.get());
+      sliceQuery.setColumnFamily("Accounts");
+      columnSliceIterator = new ColumnSliceIterator<Long,String,ByteBuffer>(sliceQuery,
+              ""+Character.MIN_VALUE, ""+Character.MAX_VALUE,false);
     }
 
     @Override
-    public Iterator<Account> iterator() {
-      return this;
+    public Iterator<HColumn<String,ByteBuffer>> iterator() {
+      return columnSliceIterator;
     }
 
-    @Override
-    public boolean hasNext() {
-      return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 
-    @Override
-    public Account next() {
-      return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void remove() {
-      //To change body of implemented methods use File | Settings | File Templates.
-    }
   }
 
 }

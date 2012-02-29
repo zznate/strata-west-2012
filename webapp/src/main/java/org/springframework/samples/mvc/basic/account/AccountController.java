@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class AccountController {
 
   @Autowired
-  private Keyspace keyspace;
+  private AccountDao accountDao;
   // TODO inject AccountAccess object
-	private Map<Long, Account> accounts = new ConcurrentHashMap<Long, Account>();
+	//private Map<Long, Account> accounts = new ConcurrentHashMap<Long, Account>();
 	
 	@RequestMapping(method=RequestMethod.GET)
 	public String getCreateForm(Model model) {
@@ -35,14 +35,15 @@ public class AccountController {
 			return "account/createForm";
 		}
     // TODO update to AccountAccess.upsert(account)
-		this.accounts.put(account.assignId(), account);
+    account.assignId();
+		accountDao.save(account);
 		return "redirect:/account/" + account.getId();
 	}
 	
 	@RequestMapping(value="{id}", method=RequestMethod.GET)
 	public String getView(@PathVariable Long id, Model model) {
     // TODO update to AccountAccess.get(id);
-		Account account = this.accounts.get(id);
+		Account account = accountDao.get(id);
 		if (account == null) {
 			throw new ResourceNotFoundException(id);
 		}
@@ -53,7 +54,7 @@ public class AccountController {
   @RequestMapping(value="list", method=RequestMethod.GET)
   	public String getList(Model model) {
       // TODO update to AccountAccess.iterator();
-  		model.addAttribute("accounts",this.accounts.values());
+  		model.addAttribute("accounts",accountDao.getAccounts());
   		return "account/list";
   	}
 
