@@ -49,7 +49,16 @@ You can retrieve the values like so:
 
 > String value1 = foundRow.getString("column1");    
 > String value2 = foundRow.getString(2);    
-> boolean value3 = foundRow.getBoolean(3);    
+> boolean value3 = foundRow.getBoolean(3);
+
+EzClient also supports counters on arbitrary rows:
+
+> Row row = new Row();
+> row.put("colname","some value");
+> row.increment("hits",1);
+
+The astute observer will note that you usually cant do this in a single Cassandra column family (counter-type column families are enabled by setting the default_validator class to CounterType).
+EzClient works around this by maintaining a separate column family (one per keyspace created) where counters are stored under the same row key used by the row.  
 
 
 
